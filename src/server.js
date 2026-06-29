@@ -9,7 +9,7 @@ const PORT = process.env.PORT ?? 3000;
 
 
   app.use(express.json());
-app.use(cors()); // Дозволяє запити з будь-яких джерел
+app.use(cors()); 
 app.use(
   pino({
     level: 'info',
