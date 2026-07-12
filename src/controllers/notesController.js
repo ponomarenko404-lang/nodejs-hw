@@ -3,8 +3,39 @@ import { Note } from "../models/note.js";
 
 
 export const getAllNotes = async (req, res) => {
-  const notes = await Note.find();
-  res.status(200).json(notes);
+
+  const { page= 1, perPage=10, tag, search } = req.query;
+  const skip = (page - 1) * perPage;
+
+  const myQuery =  Note.find();
+  if (search) {
+    myQuery.where({
+  $or: [
+    { title: { $regex: search, $options: 'i' } },
+    { content: { $regex: search, $options: 'i' } },
+      ],
+
+});
+  }
+     if (tag) {
+  myQuery.where({ tag });
+}
+
+  const [totalNotes, notes] = await Promise.all([
+    myQuery.clone().countDocuments(),
+    myQuery.skip(skip).limit(perPage).exec(),
+  ]);
+
+  const totalPages = Math.ceil(totalNotes / perPage);
+
+
+  res.status(200).json({
+    page,
+    perPage,
+    totalNotes,
+    totalPages,
+    notes,
+  });
 };
 
 export const getNoteById = async (req, res) => {
@@ -44,7 +75,7 @@ export const updateNote = async (req, res) => {
     req.body,
     { returnDocument: "after" },
   );
-  
+
   if (!note) {
     throw createHttpError(404, 'Note not found');
 }
