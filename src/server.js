@@ -5,6 +5,7 @@ import { logger } from "./middleware/logger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFoundHandler } from "./middleware/notFoundHandler.js";
 import notesRoutes from './routes/notesRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import { connectMongoDB } from "./db/connectMongoDB.js";
 import { errors } from "celebrate";
 import cookieParser from "cookie-parser";
@@ -16,7 +17,9 @@ app.use(logger);
   app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+
 app.use(notesRoutes);
+app.use(userRoutes);
 
 app.use(notFoundHandler);
 
